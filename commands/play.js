@@ -2,7 +2,6 @@ const {
 	Util
 } = require('discord.js');
 const ytdl = require('ytdl-core');
-
 module.exports = {
 	name: 'play',
 	description: 'Play a song in your channel!',
@@ -30,7 +29,7 @@ module.exports = {
 				voiceChannel: voiceChannel,
 				connection: null,
 				songs: [],
-				volume: 5,
+				volume: 3.14,
 				playing: true,
 			};
 
@@ -41,7 +40,8 @@ module.exports = {
 			try {
 				var connection = await voiceChannel.join();
 				queueContruct.connection = connection;
-				this.play(message, queueContruct.songs[0]);
+				this.play(message, queueContruct.songs[0],0);
+				message.channel.send(`✅ **${song.title}** Se esta reproduciendo!`);
 			} catch (err) {
 				console.log(err);
 				queue.delete(message.guild.id);
@@ -49,11 +49,11 @@ module.exports = {
 			}
 		} else {
 			serverQueue.songs.push(song);
-			return message.channel.send(`${song.title} has been added to the queue!`);
+			return message.channel.send(`✅  **${song.title}** has been added to the queue!`);
 		}
 	},
 
-	play(message, song) {
+	play(message, song,test) {
 		const queue = message.client.queue;
 		const guild = message.guild;
 		const serverQueue = queue.get(message.guild.id);
@@ -68,11 +68,15 @@ module.exports = {
 			.on('end', () => {
 				console.log('Music ended!');
 				serverQueue.songs.shift();
-				this.play(message, serverQueue.songs[0]);
+				this.play(message, serverQueue.songs[0],0);
 			})
 			.on('error', error => {
 				console.error(error);
 			});
 		dispatcher.setVolumeLogarithmic(serverQueue.volume / 5);
+	},
+
+	buscar(){
+
 	}
 };
