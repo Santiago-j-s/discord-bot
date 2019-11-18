@@ -44,7 +44,7 @@ client.on('message', async message => {
 		command.execute(message);
 	} catch (error) {
 		console.error(error);
-		message.reply('There was an error trying to execute that command!');
+		message.reply("Ese comando no existe, pero la puta madreee!!!");
 	}
 });
 
