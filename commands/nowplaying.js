@@ -4,6 +4,16 @@ module.exports = {
 	execute(message) {
 		const serverQueue = message.client.queue.get(message.guild.id);
 		if (!serverQueue) return message.channel.send('There is nothing playing.');
-		return message.channel.send(`Now playing: ${serverQueue.songs[0].title}`);
+		message.channel.send(`Now playing: ${serverQueue.songs[0].title}`);
+		message.channel.send("En la lista:");
+		var i = 0;
+		var string = "";
+		serverQueue.songs.forEach(element => {
+			if(i > 5){
+				string += `:musical_note: ${element.title} \n `;
+			}
+			i++;
+		});
+		return message.channel.send(string); 
 	},
 };

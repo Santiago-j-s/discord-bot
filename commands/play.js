@@ -18,7 +18,7 @@ module.exports = {
 		const args = message.content.split(' ');
 		const url = args[1];
 
-		if (url.match(/^https?:\/\/(www.youtube.com|youtube.com)\/.*list(.*)$/)) {
+		if ( url.match(/^https?:\/\/(www.youtube.com|youtube.com)\/.*list(.*)$/) ) {
 
 			message.channel.send(`Empezando a buscar en la playlist`);
 			const playlist = await youtube.getPlaylist(url);
@@ -29,11 +29,15 @@ module.exports = {
 				this.preplay(message,song2.url,true);
 			}
 			return message.channel.send(`✅ Playlist: **${playlist.title}** Se esta reproduciendo!`);
-		} else {
-		this.preplay(message,args[1],false);
+		} else if(args[1] == "search"){
+			this.buscar( message,message.content.split('search ')[1] );
+			return;
+		} else{
+			this.preplay( message,args[1],false );
+			return;
 		}
 	},
-	async preplay(message,url2,NO_SPAM){
+	async preplay( message,url2,NO_SPAM) {
 
 		const queue = message.client.queue;
 		const serverQueue = message.client.queue.get(message.guild.id);
@@ -106,12 +110,34 @@ module.exports = {
 		dispatcher.setVolumeLogarithmic(serverQueue.volume / 15);
 	},
 
-	async buscar(){
+	async buscar(msg, busqueda){
+		try {
+			var videos = await youtube.searchVideos(busqueda, 10);
+			let index = 0;
+			msg.channel.send(`
+__**Song selection:**__
 
-	const songInfo2 = await ytdl.getInfo(args[1]);
-	const song2 = {
-		title: songInfo.title,
-		url: songInfo.video_url,
-	};
+${videos.map(video2 => `**${++index} -** ${video2.title}`).join('\n')}
+
+Please provide a value to select one of the search results ranging from 1-10.
+			`);
+			// eslint-disable-next-line max-depth
+			try {
+				var response = await msg.channel.awaitMessages(msg2 => msg2.content > 0 && msg2.content < 11, {
+					maxMatches: 1,
+					time: 15000,
+					errors: ['time']
+				});
+			} catch (err) {
+				console.error(err);
+				return msg.channel.send('no se ingreso un numero, o es invalido, cancelando busqueda.');
+			}
+			const videoIndex = parseInt(response.first().content);
+			var video = await youtube.getVideoByID(videos[videoIndex - 1].id);
+			this.preplay(msg, video.url,false);
+		} catch (err) {
+			console.error(err);
+			return msg.channel.send('🆘 no encontre nada uuhY que peLoTuuDOO!!!.');
+		}
 	}
 };

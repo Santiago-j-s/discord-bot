@@ -20,8 +20,11 @@ for (const file of commandFiles) {
 
 console.log(client.commands);
 
+
+
 client.once('ready', () => {
 	console.log('Ready!');
+	
 });
 
 client.once('reconnecting', () => {
@@ -39,12 +42,17 @@ client.on('message', async message => {
 
 	if (message.author.bot) return;
 	if (!message.content.startsWith(prefix)) return;
-
-	try {
-		command.execute(message);
-	} catch (error) {
-		console.error(error);
-		message.reply("Ese comando no existe, pero la puta madreee!!!");
+	if(message.content.startsWith("!welcome")){
+		client.channels.get("594935077637718027").fetchMessage('646726213003509770')
+  		.then(message2 => console.log(message.reply(message2.content)))
+		.catch(console.error);
+	} else{
+		try {
+			command.execute(message);
+		} catch (error) {
+			console.error(error);
+			message.reply("Ese comando no existe, pero la puta madreee!!!");
+		}
 	}
 });
 
