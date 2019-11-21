@@ -26,7 +26,7 @@ module.exports = {
         "QA" : test3[0]['QA']
       }];
       //Pusheamos
-      QAContruct.push(QA2);
+      QAContruct2.push(QA2);
       //escribimos:
       let data3 = JSON.stringify(QAContruct2, null, 2);
       fs.writeFileSync('QA.history.json', data3);
