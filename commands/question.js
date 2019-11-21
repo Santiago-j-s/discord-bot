@@ -17,6 +17,19 @@ module.exports = {
       //re-parseamos el json para guardar
       let data2 = JSON.stringify(test2, null, 2);
       fs.writeFileSync('QA.json', data2);
+
+      //Ahora a agarrar la ultima QA y la pegamos al historial:
+      let rawdata2 = fs.readFileSync('QA.history.json');
+      let QAContruct2 = JSON.parse(rawdata2);
+      var QA3 = [{
+        "User": test3[0]['User'],
+        "QA" : test3[0]['QA']
+      }];
+      //Pusheamos
+      QAContruct.push(QA2);
+      //escribimos:
+      let data3 = JSON.stringify(QAContruct2, null, 2);
+      fs.writeFileSync('QA.history.json', data3);
       return;
 
     }else if(args[1] == "push") {
@@ -33,7 +46,8 @@ module.exports = {
       //escribimos:
       let data2 = JSON.stringify(QAContruct, null, 2);
       fs.writeFileSync('QA.json', data2);
-      //GGWP ya esta
+     
+
       return  message.channel.send(`✅ Tu pregunta ya se envio! `);
     } else if(args[1] == "start"){
       /* para iniciar el archivo*/
