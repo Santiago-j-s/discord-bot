@@ -55,11 +55,19 @@ module.exports = {
       //escribimos:
      // let data3 = JSON.stringify(QA3, null, 2);
       fs.writeFileSync('QA.json', QA3);
-      message.channel.send("Modulo Iniciado");
+      return message.channel.send(" ✅ Modulo Iniciado");
     }else if (args[1] == "end"){
       fs.writeFileSync('QA.json', "");
-    }else {
-      message.channel.send(`Para usar el modulo de QA usa el siguiente comando:
+      message.channel.send("listo");
+    }else if(args[1] == "history") {
+      //Primero leemos:
+      let rawdata = fs.readFileSync('QA.history.json');
+      let QAContruct4 = JSON.parse(rawdata);
+      //escribimos:
+      message.channel.send(`✅ Historial de pregunas:`);
+      return  message.channel.send(`${QAContruct4}`);
+     }else {
+       return message.channel.send(`Para usar el modulo de QA usa el siguiente comando:
       \n !question push "tu pregunta aca" (no hace faltan las comillas , si respetar los espacios)`);
     }
 
