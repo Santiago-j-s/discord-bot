@@ -1,5 +1,9 @@
 {
-	"extends": "eslint:recommended",
+	"extends": [
+		"eslint:recommended",
+		"plugin:prettier/recommended"
+	],
+	"plugins": ["prettier"],
 	"env": {
 		"node": true,
 		"es6": true
@@ -8,8 +12,17 @@
 		"ecmaVersion": 2017
 	},
 	"rules": {
-		"brace-style": ["error", "stroustrup", { "allowSingleLine": true }],
-		"comma-dangle": ["error", "always-multiline"],
+		"brace-style": ["error", "1tbs"],
+		"comma-dangle": [
+			"error",
+			{
+				"arrays": "always-multiline",
+				"exports": "always-multiline",
+				"functions": "never",
+				"imports": "always-multiline",
+				"objects": "always-multiline"
+			}
+		],
 		"comma-spacing": "error",
 		"comma-style": "error",
 		"curly": ["error", "multi-line", "consistent"],
@@ -42,6 +55,7 @@
 		"space-infix-ops": "error",
 		"space-unary-ops": "error",
 		"spaced-comment": "error",
-		"yoda": "error"
+		"yoda": "error",
+		"prettier/prettier": "error"
 	}
 }
