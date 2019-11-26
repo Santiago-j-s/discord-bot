@@ -1,80 +1,82 @@
-const fs = require('fs');
+const sqlite3 = require('sqlite3').verbose();
 module.exports = {
 	name: 'question',
 	description: 'Modulo para ayudar en las charlas QA',
 	execute(message) {
+		// Codigo para mover la DB:
+		const db = new sqlite3.Database('./db1.sqlite', err => {
+			if (err) {
+				console.error(err.message);
+			}
+			console.log('Conectado a la DB');
+		});
 
-    args = message.content.split(' ');
+		const args = message.content.split(' ');
 
-    if(args[1] == "shift"){
-      //leemos y parseamos el json
-      let rawdata = fs.readFileSync('QA.json');
-      let test2 = JSON.parse(rawdata);
-      //sacamos el primero
-      var test3 = test2.shift();
-      console.log(test3);
-      message.channel.send(`<${test3[0]['User']}>  Pregunto: **${test3[0]['QA']}** `);
-      //re-parseamos el json para guardar
-      let data2 = JSON.stringify(test2, null, 2);
-      fs.writeFileSync('QA.json', data2);
+		// eslint-disable-next-line no-undef
+		if (args[1] == 'shift') {
+			// codigo para sacar *una* pregunta de la db y pasarla al historial:
+			// eslint-disable-next-line prettier/prettier
+			const sql =
+				'SELECT DISTINCT User User , QA Question , _rowid_ id FROM Questions WHERE Estado = 0 ORDER BY _rowid_ ';
+			db.get(sql, [], (err, row) => {
+				if (err) throw err;
 
-      //Ahora a agarrar la ultima QA y la pegamos al historial:
-      let rawdata2 = fs.readFileSync('QA.history.json');
-      let QAContruct2 = JSON.parse(rawdata2);
-      var QA3 = [{
-        "User": test3[0]['User'],
-        "QA" : test3[0]['QA']
-      }];
-      //Pusheamos
-      QAContruct2.push(QA2);
-      //escribimos:
-      let data3 = JSON.stringify(QAContruct2, null, 2);
-      fs.writeFileSync('QA.history.json', data3);
-      return;
+				if (row != undefined) {
+					console.log(`${row.User} pregunto: ${row.Question} `);
+					message.channel.send(
+						`${row.User} pregunto: ${row.Question} `
+					);
+					const sql2 = `UPDATE Questions SET Estado = 1 WHERE _rowid_ = ${row.id};`;
+					db.all(sql2, []);
+				} else {
+					message.channel.send(
+						// eslint-disable-next-line quotes
+						`No hay mas preguntas para responder ameo'`
+					);
+					// eslint-disable-next-line quotes
+					console.log(`No hay mas preguntas para responder ameo'`);
+				}
+			});
+		} else if (args[1] == 'push') {
+			// eslint-disable-next-line quotes
+			// eslint-disable-next-line prettier/prettier
+			let sql3 = `INSERT INTO Questions (User,QA) VALUES  ('${message.author.username}','${message.content.split('push ')[1]}')`;
 
-    }else if(args[1] == "push") {
-      //Primero leemos:
-      let rawdata = fs.readFileSync('QA.json');
-      let QAContruct = JSON.parse(rawdata);
-      //ahora agregamos la Pregunta 0km
-      var QA2 = [{
-          "User": message.author.username,
-          "QA" : message.content.split('push ')[1]
-      }];
-      //Pusheamos
-      QAContruct.push(QA2);
-      //escribimos:
-      let data2 = JSON.stringify(QAContruct, null, 2);
-      fs.writeFileSync('QA.json', data2);
-      return  message.channel.send(`✅ Tu pregunta ya se envio! `);
+			db.get(sql3, [], (err, row) => {
+				if (err) {
+					throw err;
+				} else {
+					console.log('Se ingreso una nueva pregunta!');
+					return message.channel.send('✅ Tu pregunta ya se envio!');
+				}
+			});
+		} else if (args[1] == 'history') {
+			const sql2 = `SELECT DISTINCT QA Question  , User User  , _rowid_ id
+            FROM Questions
+            WHERE Estado = 1
+			ORDER BY _rowid_ `;
 
-    } else if(args[1] == "start"){
-      /* para iniciar el archivo*/
-      var QA3 = '[[ {  "User": "test2", "QA": "manda otro shift, esto es solo para iniciar el array!!" } ]]';
-      //escribimos:
-     // let data3 = JSON.stringify(QA3, null, 2);
-      fs.writeFileSync('QA.json', QA3);
-      return message.channel.send(" ✅ Modulo Iniciado");
+			db.all(sql2, [], (err, rows) => {
+				if (err) {
+					throw err;
+				}
+				let txt = '';
+				rows.forEach(row => {
+					// eslint-disable-next-line prettier/prettier
+					txt += `${row.User} pregunto: ${row.Question} \n`;
 
-    }else if (args[1] == "end"){
-
-      fs.writeFileSync('QA.json', "");
-      message.channel.send("listo");
-
-    }else if(args[1] == "history") {
-      //Primero leemos:
-      let rawdata = fs.readFileSync('QA.history.json');
-      let QAContruct4 = JSON.parse(rawdata);
-      //escribimos:
-      message.channel.send(`✅ Historial de pregunas:`);
-      QAContruct4.forEach(element => {
-       console.log(` <${element.User}> pregunto:  ${element.QA} `);
-      });
-      return;
-     }else {
-       return message.channel.send(`Para usar el modulo de QA usa el siguiente comando:
+					console.log(
+						`${row.User} pregunto (en un pasado muy muy lejano): ${row.Question} `
+					);
+				});
+				message.channel.send(txt);
+			});
+			return;
+		} else {
+			return message.channel
+				.send(`Para usar el modulo de QA usa el siguiente comando:
       \n !question push "tu pregunta aca" (no hace faltan las comillas , si respetar los espacios)`);
-    }
-
+		}
 	},
 };

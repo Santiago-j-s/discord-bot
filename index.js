@@ -1,10 +1,7 @@
-const fs = require('fs')
+const fs = require('fs');
 const Discord = require('discord.js');
 const Client = require('./client/Client');
-const {
-	prefix,
-	token,
-} = require('./config.json');
+const { prefix, token } = require('./config.json');
 
 const client = new Client();
 client.commands = new Discord.Collection();
@@ -20,11 +17,8 @@ for (const file of commandFiles) {
 
 console.log(client.commands);
 
-
-
 client.once('ready', () => {
 	console.log('Ready!');
-	
 });
 
 client.once('reconnecting', () => {
@@ -42,16 +36,23 @@ client.on('message', async message => {
 
 	if (message.author.bot) return;
 	if (!message.content.startsWith(prefix)) return;
-	if(message.content.startsWith("!welcome")){
-		client.channels.get("594935077637718027").fetchMessage('646726213003509770')
-  		.then(message2 => console.log(message.reply(message2.content)))
-		.catch(console.error);
-	} else{
+	if (message.content.startsWith('!welcome')) {
+		client.channels
+			.get('594935077637718027')
+			.fetchMessage('646726213003509770')
+			.then(message2 => console.log(message.reply(message2.content)))
+			.catch(console.error);
+	} else {
 		try {
 			command.execute(message);
 		} catch (error) {
 			console.error(error);
-			message.reply("Ese comando no existe, pero la puta madreee!!!");
+			const numero = Math.floor(Math.random() * 100 + 1);
+			if (numero == 45) {
+				message.reply('Ese comando no existe, pero la puta madreee!!!');
+			} else {
+				message.reply('usa !help para tener una lista de comandos');
+			}
 		}
 	}
 });
