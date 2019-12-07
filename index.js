@@ -17,7 +17,16 @@ for (const file of commandFiles) {
 
 console.log(client.commands);
 
+const logMemUsg = () => {
+	console.log(
+		`The script uses approximately ${process.memoryUsage().heapUsed /
+			1024 /
+			1024} MB`
+	);
+};
+
 client.once('ready', () => {
+	logMemUsg();
 	console.log('Ready!');
 });
 

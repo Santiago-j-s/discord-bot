@@ -41,7 +41,7 @@ module.exports = {
 		} else if (args[1] == 'push') {
 			// eslint-disable-next-line quotes
 			// eslint-disable-next-line prettier/prettier
-			let sql3 = `INSERT INTO Questions (User,QA) VALUES  ('${message.author.username}','${message.content.split('push ')[1]}')`;
+			const sql3 = `INSERT INTO Questions (User,QA) VALUES  ('${message.author.username}','${message.content.split('push ')[1]}')`;
 
 			db.get(sql3, [], (err, row) => {
 				if (err) {

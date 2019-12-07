@@ -15,7 +15,7 @@ module.exports = {
 		const args = message.content.split(' ');
 		const url = args[1];
 		const pattern = /^https?:\/\/(www.youtube.com|youtube.com)\/.*list(.*)$/;
-
+		const pattern2 = /^https?:\/\/(www.youtube.com|youtube.com)\/watch\?v=/;
 		if (url.match(pattern)) {
 			message.channel.send('Empezando a buscar en la playlist');
 			const playlist = await youtube.getPlaylist(url);
@@ -34,9 +34,13 @@ module.exports = {
 		} else if (args[1] == 'search') {
 			this.buscar(message, message.content.split('search ')[1]);
 			return;
-		} else {
+		} else if (url.match(pattern2)) {
 			this.preplay(message, args[1], false);
 			return;
+		} else {
+			return message.reply(
+				'Ingresaste mal el comando o la url, intenta otra vez!'
+			);
 		}
 	},
 	async preplay(message, url2, NO_SPAM) {
