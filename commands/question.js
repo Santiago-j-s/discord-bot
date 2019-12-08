@@ -1,4 +1,8 @@
 const sqlite3 = require('sqlite3').verbose();
+/**
+ * @module commands/question
+ * @type {Command}
+ */
 module.exports = {
 	name: 'question',
 	description: 'Modulo para ayudar en las charlas QA',
