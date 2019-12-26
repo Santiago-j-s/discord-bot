@@ -56,11 +56,10 @@ module.exports = class Db {
 	 */
 	isVerifiedUser(userId) {
 		const sql = `
-			SELECT EXISTS(
-				SELECT Id
-				FROM ${userTable}
-				WHERE Id=? AND (Verified=1 OR MsgsCnt >= ${thresholdMsgsToVerifyUser})
-			)`;
+			SELECT Id, Verified
+			FROM ${userTable}
+			WHERE Id=? AND (Verified=1 OR MsgsCnt >= ${thresholdMsgsToVerifyUser})
+		`;
 
 		new Promise(resolve => {
 			this.db.get(sql, [userId], (err, row) => {
