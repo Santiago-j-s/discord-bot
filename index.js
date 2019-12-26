@@ -1,14 +1,22 @@
+/**
+ * @typedef {import("discord.js").Message} Message
+ * @typedef {import("discord.js").User} User
+ */
 const fs = require('fs');
 const Discord = require('discord.js');
 const Client = require('./client/Client');
 const { prefix, token } = require('./config.json');
+const Db = require('./db/sqlite/db');
 
 const client = new Client();
 client.commands = new Discord.Collection();
 
-const queue = new Map();
+const dbPath = './db1.sqlite';
+const db = new Db(dbPath);
 
-const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
+const commandFiles = fs
+	.readdirSync('./commands')
+	.filter(file => file.endsWith('.js'));
 
 for (const file of commandFiles) {
 	const command = require(`./commands/${file}`);
@@ -24,6 +32,27 @@ const logMemUsg = () => {
 			1024} MB`
 	);
 };
+
+/**
+ * @param {Db} db
+ * @param {User} author
+ * @param {Message} message
+ */
+async function autoBan(db, author, message) {
+	const isProblematicUser = () =>
+		message.mentions.users.first().id === '631621499262074881';
+
+	if (!(await db.isVerifiedUser(author.id))) {
+		if (isProblematicUser()) {
+			message.guild.member(author).ban({
+				reason: 'Bye!',
+				days: 1,
+			});
+		} else {
+			db.incrementVerifyMsgs(author);
+		}
+	}
+}
 
 client.once('ready', () => {
 	logMemUsg();
@@ -42,8 +71,11 @@ client.on('message', async message => {
 	const args = message.content.slice(1).split(/ +/);
 	const commandName = args.shift().toLowerCase();
 	const command = client.commands.get(commandName);
+	const author = message.author;
 
-	if (message.author.bot) return;
+	if (author.bot) return;
+	autoBan(db, author, message);
+
 	if (!message.content.startsWith(prefix)) return;
 	if (message.content.startsWith('!welcome')) {
 		client.channels
