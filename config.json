@@ -1,5 +1,7 @@
 {
     "prefix": "!",
     "token": "",
-    "GToken": ""
+    "GToken": "",
+    "cafeId": "",
+    "dbPath": "./db1.sqlite"
 }
